@@ -1,0 +1,65 @@
+#pragma once
+#include <vector>
+#include "Users.h"
+#include "Message.h"
+#include "bad_login.h"
+#include "bad_password.h"
+#include <unistd.h>
+#include <string.h>
+#include <string>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <netinet/in.h>
+
+#define MESSAGE_LENGTH 1024 // max size of bufer
+#define PORT 7777
+
+constexpr auto userData = "/tmp/Data/userData.txt";	// файл для хранения данных пользователей 
+constexpr auto user_count = "/tmp/Data/user_count.txt";	// файл для хранения кол-ва зарегистрированных пользователей
+constexpr auto private_message = "/tmp/Data/private_message.txt";	// файл для хранения непросмотренных личных сообщений
+constexpr auto public_message = "/tmp/Data/public_message.txt";	// файл для хранения непрочитанных общих сообщений
+constexpr auto prvt_msg_count = "/tmp/Data/private_message_count.txt";   // файл для хранения кол-ва личных непрочитанных сообщений
+constexpr auto pblc_msg_count = "/tmp/Data/public_message_count.txt";   // файл для хранения кол-ва общих непрочитанных сообщений
+
+
+class Chat
+{
+private:
+	std::vector<Users> allUsers; // все зарегистрированные пользователи
+	std::string _recipient; //получатель сообщения
+	std::string _sender; // отправитель сообщения
+	std::string _login; // логин авторизованного пользователя
+	std::string _password; // пароль авторизованного пользователя
+	std::vector<Message>allMessage; // все новые приватные сообщения
+	std::vector<Message>allPublicMessage; // все новые общие сообщения
+	std::vector<Message>viewedMessage; // просмотренные сообщения
+	bool _status = false; // если был выполнен вход статус = true, в противном случае - false.
+	struct sockaddr_in serveraddress, client;
+	socklen_t length;
+	int socket_file_descriptior, connection, bind_status, connection_status;
+	char message[MESSAGE_LENGTH];
+public:
+	Chat(); // конструктор
+	~Chat(); // деструктор
+	void writeUsers() const; // метод для записи данных о пользователях в файл
+	void writeMessage() const; // метод для записи данных о сообщениях в файл
+	void readUsers(); // метод для чтения данных о пользователях из файла
+	void readPrivateMessage(); // метод для чтения личных сообщений из файла
+	void readPublicMessage(); // метод для чтения общих сообщений из файла			   
+	int getReadUsersStatus(); // метод выводит 1, если есть файл userData, иначе -1
+	void getChat(); // метод выводит данные пользователя
+	void enter(); // авторизация пользователя
+	void registration(); //  регистрация пользователя
+	void sendPrivateMessage(); // отправка личных сообщений
+	void sendPublicMessage(); // отправка публичных сообщений
+	bool getstatus(); // метод выводит статус авторизации (_status)
+	void exit(); // разлогинить авторизованного пользователя
+	void printMessage(std::string recipient); // вывод на экран новых сообщений
+	void deletePrivateMessage(std::string recipient); // перемещение прочитанных личных сообщений в viewedMessage и их удаление из allMessage
+	void deletePublicMessage(std::string recipient); // удаление прочитанных общих сообщений из allPublicMessage
+	void printAllMessage(); // вывод на экран всех просмотренных личных сообщений
+	void start(); // начало работы программы
+	void server_start();
+	void client_start();
+	void socket_close();
+};
