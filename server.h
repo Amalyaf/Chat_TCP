@@ -57,7 +57,7 @@ public:
 	void deletePrivateMessage(std::string recipient); // перемещение прочитанных личных сообщений в viewedMessage и их удаление из allMessage
 	void deletePublicMessage(std::string recipient); // удаление прочитанных общих сообщений из allPublicMessage
 	void printAllMessage(); // вывод на экран всех просмотренных личных сообщений
-	void start(); // начало работы программы
+	int start(); // начало работы программы
 	void server_start();
 	void client_start();
 	void socket_close();

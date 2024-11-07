@@ -447,7 +447,7 @@ void Chat::readPublicMessage() {
 }
 
 
-void Chat::start() {
+int Chat::start() {
 socket_close();
  char c = 'y'; // условие выхода из цикла
 
@@ -464,11 +464,11 @@ socket_close();
 		cout << endl;
 	}
 
-	// create socket   
+	// create socket
     socket_file_descriptior = socket(AF_INET, SOCK_STREAM, 0);
     if (socket_file_descriptior == -1){
-        cout << "Не удалось создать сокет!" << endl;
-        return;
+        cout << "Socket creation failed!" << endl;
+        exit();
     }
     serveraddress.sin_addr.s_addr = htonl(INADDR_ANY);
     // Зададим номер порта для связи
@@ -479,68 +479,80 @@ socket_close();
     bind_status = bind(socket_file_descriptior, (struct sockaddr*)&serveraddress,
     sizeof(serveraddress));
     if (bind_status == -1) {
-        cout << "Привязка сокета не удалась!" << endl;
-        return;
+        cout << "Socket binding failed!" << endl;
+        exit();
     }
-	
     // Поставим сервер на прием данных 
     connection_status = listen(socket_file_descriptior, 5);
     if (connection_status == -1) {
-        cout << "Сокет не может прослушивать новые соединения!" << endl;
-        return;
+        cout << "Socket is unable to listen for new connections!" << endl;
+        exit();
     }
     else {
-        cout << "Сервер прослушивает новое соединение:" << endl;
+        cout << "Server is listening for new connection:" << endl;
     }
     length = sizeof(client);
-    connection = accept(socket_file_descriptior,(struct sockaddr*)&client, &length);
+    connection = accept(socket_file_descriptior, (struct sockaddr*)&client, &length);
     if (connection == -1) {
-        cout << "Сервер не может принять данные от клиента!" << endl;
-        return;
+        cout << "Server is unable to accept the data from client!" << endl;
+        exit();
     }
-	bzero(message, sizeof(message));
-    read(connection, message, sizeof(message));
-    if (strncmp(message, "end", 3) == 0) {
-        cout << "Клиент вышел!" << endl;
-        cout << "Сервер закрывается!" << endl;
-        return;
-        }
-	enter_login(message);
-	char login[sizeof(message)];
-	if (enter_login(message) == 1) {
-		cout << "Data received from client: " << message << endl;
-		strcpy(login, message);
-		cout << login << endl;
-        bzero(message, sizeof(message));}
-        //cout << "Enter the message you want to send to the client:" << endl;
-        //getline(cin, message);
-		//cin.ignore();
-        //ssize_t bytes = write(connection, &message, message.size());
-        // Если передали >= 0  байт, значит пересылка прошла успешно
-        //if (bytes >= 0) {
-        //    cout << "Data successfully sent to the client!" << endl;
-        //
+    
+		bzero(message, sizeof(message));
+        read(connection, message, sizeof(message));
+        if (strncmp(message, "end", 3) == 0) {
+            cout << "Client exited!" << endl;
+            cout << "Server is exiting!" << endl;
+    	}
 		
-    	/*read(connection, message, sizeof(message));
-    	if (strncmp(message, "end", 3) == 0) {
-        	cout << "Client exited!" << endl;
-        	cout << "Server is exiting!" << endl;
-        	return;
+		enter_login(message);
+		if (enter_login(message) == 1){
+			char login [MESSAGE_LENGTH];
+			strcpy(login, message);
+			cout << "Login: " << login << endl;
+			bzero(message, sizeof(message));
+        	cin.getline(message, sizeof(message));
+        	ssize_t bytes = write(connection, message, sizeof(message));
+        // Если передали >= 0  байт, значит пересылка прошла успешно
+        if (bytes >= 0) {
+            cout << "Data successfully sent to the client!" << endl;
         }
-		cout << "Proverka logina " << login << endl;
-	enter_password(login, message);
-	}
 
-    cout << "Data received from client: " << message << endl;
-    bzero(message, sizeof(message));
-    cout << "Enter the message you want to send to the client:" << endl;
-    cin.get(message, sizeof(message));
-	cin.ignore();
-    ssize_t bytes = write(connection, message, sizeof(message));
-    // Если передали >= 0  байт, значит пересылка прошла успешно
-    if (bytes >= 0) {
-        cout << "Data successfully sent to the client!" << endl;
-    }
+		bzero(message, sizeof(message));
+        read(connection, message, sizeof(message));
+        if (strncmp(message, "end", 3) == 0) {
+            cout << "Client exited!" << endl;
+            cout << "Server is exiting!" << endl;
+    	}
+		enter_password(login, message);
+		}
+
+		else {
+			//закрываем сокет, завершаем соединение
+    		close(socket_file_descriptior);
+			exit();
+		}
+
+		bzero(message, sizeof(message));
+        read(connection, message, sizeof(message));
+        if (strncmp(message, "end", 3) == 0) {
+            cout << "Client exited!" << endl;
+            cout << "Server is exiting!" << endl;
+    	}
+
+        cout << "Data received from client: " << message << endl;
+        bzero(message, sizeof(message));
+        cout << "Enter the message you want to send to the client:" << endl;
+        cin.getline(message, sizeof(message));
+        ssize_t bytes = write(connection, message, sizeof(message));
+        // Если передали >= 0  байт, значит пересылка прошла успешно
+        if (bytes >= 0) {
+            cout << "Data successfully sent to the client!" << endl;
+        }
+
+       
+    // закрываем сокет, завершаем соединение
+    close(socket_file_descriptior);
        /* getChat();
         enter(); // авторизация
         c = 'y';
@@ -590,6 +602,7 @@ socket_close();
                         cout << "\nВход не выполнен!\n";
                 }
         }*/
+	   return 0;
 }
 
 int Chat::enter_login(char* login)
@@ -620,6 +633,10 @@ void Chat::enter_password(char login[], char password[]) {
 		{
 			Users user;
 			user._login = login;
+			vector<Users>::iterator result = find(allUsers.begin(), allUsers.end(), user);
+
+			user = *result;
+			
 			cout << "Proverka!" << endl;
 			cout << user._login << " " << user._password << endl;
 			cout << login << " " << password << endl;
@@ -627,10 +644,11 @@ void Chat::enter_password(char login[], char password[]) {
 			{
 				throw BadPassword();
 			}
-			else
+			else if (user._password == password)
 			{
+				cout << "Correct!!!" << endl;
 				_status = true;
-				printMessage(_login);
+				//printMessage(_login);
 			}
 		}
 		catch (BadPassword& e)

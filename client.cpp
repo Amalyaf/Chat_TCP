@@ -43,7 +43,7 @@ int main() {
         if (bytes >= 0) {
             cout << "data send to the server successfully!" << endl;
         }
-        //bzero (&message, sizeof(message));
+        bzero (message, sizeof(message));
         // Ждем ответа от сервера
         read(socket_file_descriptior, message, sizeof(message));
         cout << "Data received from server: " << message << endl; 
