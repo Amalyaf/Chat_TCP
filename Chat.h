@@ -2,6 +2,7 @@
 #include <vector>
 #include "Users.h"
 #include "Message.h"
+#include "Socket.h"
 
 constexpr auto userData = "/tmp/Data/userData.txt";	// файл для хранения данных пользователей 
 constexpr auto user_count = "/tmp/Data/user_count.txt";	// файл для хранения кол-ва зарегистрированных пользователей
@@ -23,6 +24,7 @@ private:
 	std::vector<Message>allPublicMessage; // все новые общие сообщения
 	std::vector<Message>viewedMessage; // просмотренные сообщения
 	bool _status = false; // если был выполнен вход статус = true, в противном случае - false.
+	Server server;
 public:
 	Chat(); // конструктор
 	~Chat(); // деструктор

@@ -12,6 +12,13 @@ Chat::Chat()
 {
 	vector<Users> allUsers;
 
+	if (server.init() == 0){
+		std::cout << "Server successfully connected!" << std::endl;
+	}
+	else {
+		std::cout << "Server not connected!" << std::endl;
+	}
+
 	// если есть файл с данными ранее зарегистрированных пользователей, то вызвать методы для считывания данных из файлов
 	if (getReadUsersStatus() == 1) {
 		readUsers();
@@ -23,6 +30,7 @@ Chat::Chat()
 Chat::~Chat() {
 	writeUsers(); // метод для записи данных зарегистрированных пользователей в файл
 	writeMessage(); // метод для записи личных и публичных сообщений в отдельные файлы
+	server.exit();
 }
 
 
