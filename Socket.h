@@ -24,7 +24,7 @@ public:
     Server();
     ~Server();
     int init();
-    void Write(char text[]);
+    void Write(char text[], int size);
     std::string Read();
     void exit();
 };

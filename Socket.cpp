@@ -45,24 +45,25 @@ int Server::init()
     return 0;
 }
 
-void Server::Write(char text[])
+void Server::Write(char text[], int size)
 {
      //bzero(msg, sizeof(MESSAGE_LENGTH));
-        ssize_t bytes = write(connection, text, sizeof(text));
+        ssize_t bytes = write(connection, text, sizeof(size));
         // Если передали >= 0  байт, значит пересылка прошла успешно
         if(bytes >= 0)  {
            std::cout << "Data successfully sent to the client.!" << std::endl;
         }
+
 }
 
 std::string Server::Read()
 {
-   bzero(msg, MESSAGE_LENGTH);
+   bzero(msg, sizeof(msg));
         read(connection, msg, sizeof(msg));
             if (strncmp("end", msg, 3) == 0) {
                 std::cout << "Client Exited." << std::endl;
                 std::cout << "Server is Exiting..!" << std::endl;
-                return;
+                exit();
             }
         std::cout << "Data received from client: " <<  msg << std::endl;
         result = msg;

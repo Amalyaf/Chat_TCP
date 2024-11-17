@@ -11,14 +11,6 @@ using namespace std;
 Chat::Chat()
 {
 	vector<Users> allUsers;
-
-	if (server.init() == 0){
-		std::cout << "Server successfully connected!" << std::endl;
-	}
-	else {
-		std::cout << "Server not connected!" << std::endl;
-	}
-
 	// если есть файл с данными ранее зарегистрированных пользователей, то вызвать методы для считывания данных из файлов
 	if (getReadUsersStatus() == 1) {
 		readUsers();
@@ -44,13 +36,20 @@ void Chat::getChat()
 
 void Chat::enter()
 {
+	if (server.init() == 0){
+		std::cout << "Server successfully connected!" << std::endl;
+	}
+	else {
+		std::cout << "Server not connected!" << std::endl;
+	}
+
 	char c = 'y';
 	while (c != 'n')
-	{
+	{char text[MESSAGE_LENGTH] = {"L"};
 		try
 		{
-			cout << "\nДля входа введите логин: \n";
-			cin >> _login;
+			server.Write(text, sizeof(text));
+			_login = server.Read();
 			Users user;
 			user._login = _login;
 			vector<Users>::iterator result = find(allUsers.begin(), allUsers.end(), user);
@@ -63,8 +62,8 @@ void Chat::enter()
 			else
 			{
 				user = *result;
-				cout << "Введите пароль: \n";
-				cin >> _password;
+				server.Write(text, sizeof(text));
+				_password = server.Read();
 				
 				if (user._password != _password)
 				{
