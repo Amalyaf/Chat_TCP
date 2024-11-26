@@ -18,13 +18,12 @@ private:
     int connection;
     int bind_status;
     int  connection_status;
-    char msg[MESSAGE_LENGTH];
-    std::string result;
+    std::string msg;
 public:
     Server();
     ~Server();
     int init();
-    void Write(char text[], int size);
+    void Write(std::string text);
     std::string Read();
     void exit();
 };

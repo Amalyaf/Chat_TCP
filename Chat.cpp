@@ -45,10 +45,10 @@ void Chat::enter()
 
 	char c = 'y';
 	while (c != 'n')
-	{char text[MESSAGE_LENGTH] = {"L"};
+	{
 		try
 		{
-			server.Write(text, sizeof(text));
+			server.Write("Enter the login:");
 			_login = server.Read();
 			Users user;
 			user._login = _login;
@@ -62,7 +62,7 @@ void Chat::enter()
 			else
 			{
 				user = *result;
-				server.Write(text, sizeof(text));
+				server.Write("Введите пароль:");
 				_password = server.Read();
 				
 				if (user._password != _password)

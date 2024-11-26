@@ -45,29 +45,43 @@ int Server::init()
     return 0;
 }
 
-void Server::Write(char text[], int size)
+void Server::Write(std::string msg)
 {
-     //bzero(msg, sizeof(MESSAGE_LENGTH));
-        ssize_t bytes = write(connection, text, sizeof(size));
-        // Если передали >= 0  байт, значит пересылка прошла успешно
-        if(bytes >= 0)  {
-           std::cout << "Data successfully sent to the client.!" << std::endl;
+     //msg.clear();
+        // Ввод сообщения от сервера
+        //std::cout << "Enter the message you want to send to the client: " << std::endl;
+        //std::getline(std::cin, msg);  // Используем getline для ввода строки с пробелами
+        
+        // Отправка данных клиенту
+        ssize_t bytes_sent = write(connection, msg.c_str(), msg.size());
+        if (bytes_sent >= 0) {
+            std::cout << "Data successfully sent to the client!" << std::endl;
+        } else {
+            std::cout << "Failed to send data to the client!" << std::endl;
         }
-
 }
 
 std::string Server::Read()
 {
-   bzero(msg, sizeof(msg));
-        read(connection, msg, sizeof(msg));
-            if (strncmp("end", msg, 3) == 0) {
-                std::cout << "Client Exited." << std::endl;
-                std::cout << "Server is Exiting..!" << std::endl;
-                exit();
-            }
-        std::cout << "Data received from client: " <<  msg << std::endl;
-        result = msg;
-    return result;
+    msg.clear();
+        // Чтение данных от клиента
+        char buffer[MESSAGE_LENGTH];
+        ssize_t bytes_received = read(connection, buffer, sizeof(buffer));
+        if (bytes_received > 0) {
+            buffer[bytes_received] = '\0';  // Завершаем строку нулевым символом
+            msg = buffer;
+            std::cout << "Data received from client: " << msg << std::endl;
+        } else {
+            std::cout << "Error reading from client!" << std::endl;
+            return "error";
+        }
+
+        if (msg == "end") {
+            std::cout << "Client Exited." << std::endl;
+            std::cout << "Server is Exiting..." << std::endl;
+            return msg;
+        }
+        return msg;
 }
 
 void Server::exit()
