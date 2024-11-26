@@ -17,6 +17,12 @@ Chat::Chat()
 		readPrivateMessage();
 		readPublicMessage();
 	}
+	if (server.init() == 0){
+		std::cout << "Server successfully connected!" << std::endl;
+	}
+	else {
+		std::cout << "Server not connected!" << std::endl;
+	}
 }
 
 Chat::~Chat() {
@@ -36,19 +42,12 @@ void Chat::getChat()
 
 void Chat::enter()
 {
-	if (server.init() == 0){
-		std::cout << "Server successfully connected!" << std::endl;
-	}
-	else {
-		std::cout << "Server not connected!" << std::endl;
-	}
-
-	char c = 'y';
-	while (c != 'n')
+	string c = "y";
+	while (c != "n")
 	{
 		try
 		{
-			server.Write("Enter the login:");
+			server.Write("Введите логин:");
 			_login = server.Read();
 			Users user;
 			user._login = _login;
@@ -72,62 +71,66 @@ void Chat::enter()
 				else
 				{
 					_status = true;
-					c = 'n';
+					c = "n";
 					printMessage(_login);
 				}
 			}
 		}
 		catch (BadLogin& e)
 		{
-			cout << e.what() << endl;
-			cin >> c;
+			server.Write(e.what());
+			c = server.Read();
 		}
 		catch (BadPassword& e)
 		{
-			cout << e.what() << endl;
-			cin >> c;
+			server.Write(e.what());
+			c = server.Read();
 		}
 	}
 }
 
 void Chat::registration()
 {
-	char c = 'y';
-		while (c != 'n')
+	string c = "y";
+		while (c != "n")
 		{
-			cout << "\nРегистрация нового пользователя\n";
+			server.Write("\nРегистрация нового пользователя:\n");
 			Users user;
-			user.setUser();
+			server.Write("Введите логин: ");
+			user.setLogin(server.Read());
+			server.Write("Введите пароль: ");
+			user.setPassword(server.Read());
+			server.Write("Введите имя: ");
+			user.setName(server.Read());
 			vector<Users>::iterator result = find(allUsers.begin(), allUsers.end(), user);
 			if (result != allUsers.end())
 			{
-				cout << "\nПользователь с таким логином уже существует!\nХотите повторить попытку?(y/n)";
-				cin >> c;
-				cout << endl;
+				server.Write("\nПользователь с таким логином уже существует!\nХотите повторить попытку?(y/n)");
+				c = server.Read();
 			}
 			else
 			{
 				allUsers.push_back(user);
-				c = 'n';
+				c = "n";
 			}
 		}
 }
 
 void Chat::sendPrivateMessage()
 {
-	char c = 'y';
+	string c = "y";
 	_sender = _login;
-	while (c != 'n')
+	while (c != "n")
 	{
-		cout << "Кому: ";
-		cin >> _recipient;
+		server.Write("Кому: ");
+		_recipient = server.Read();
 		Users user;
 		user._login = _recipient;
 		vector<Users>::iterator result = find(allUsers.begin(), allUsers.end(), user);
 		if (result == allUsers.end())
 		{
-			cout << "\nПолучатель не найден!\nХотите повторить попытку?(y/n)";
-			cin >> c;
+			server.Write("\nПолучатель не найден!\nХотите повторить попытку?(y/n)");
+			c = server.Read();
 		}
 
 		else
@@ -135,10 +138,10 @@ void Chat::sendPrivateMessage()
 			Message message;
 			message._recipient = _recipient;
 			message._sender = _sender;
-			cout << "\nВведите сообщение:\n";
-			message.setMessage();
+			server.Write("\nВведите сообщение:\n");
+			message.setMessage(server.Read());
 			allMessage.push_back(message);
-			c = 'n';
+			c = "n";
 		}
 	}
 }
@@ -147,8 +150,8 @@ void Chat::sendPublicMessage()
 {
 	Message message;
 	message._sender = _login;
-	cout << "\nВведите групповое сообщение:\n";
-	message.setMessage();
+	server.Write("\nВведите групповое сообщение:\n");
+	message.setMessage(server.Read());
 	for (vector<Users>::iterator it = allUsers.begin(); it < allUsers.end(); it++)
 	{
 		if (it->_login != _login)
@@ -173,17 +176,21 @@ void Chat::printMessage(string recipient)
 			count++;
 			if (count == 1)
 			{
-				cout << "\n------------------------------------------------------\n";
-				cout << "У вас есть новые личные сообщения" << ": ";
+				server.Write("\n------------------------------------------------------\n");
+				server.Write("У вас есть новые личные сообщения: ");
 			}
-			cout << "\nОтправитель: " << it->_sender << endl <<
-				"Получатель: " << it->_recipient << endl <<
-				"Сообщение: " << it->_message << endl;
+			server.Write("\nОтправитель: " );
+			server.Write(it->_sender);
+			server.Write("\nПолучатель: " );
+			server.Write(it->_recipient);
+			server.Write("\nСообщение: ");
+			server.Write(it->_message);
+			server.Write("\n");
 		}
 	}
 	if (count != 0)
 	{
-		cout << "\n------------------------------------------------------\n";
+		server.Write("\n------------------------------------------------------\n");
 		deletePrivateMessage(recipient);
 	}
 	count = 0;
@@ -194,16 +201,19 @@ void Chat::printMessage(string recipient)
 			count++;
 			if (count == 1)
 			{
-				std::cout << "\n------------------------------------------------------\n";
-				std::cout << "У вас есть новые общие сообщения" << ": ";
+				server.Write("\n------------------------------------------------------\n");
+				server.Write("У вас есть новые общие сообщения: ");
 			}
-			cout << "\nОтправитель: " << it->_sender << endl <<
-				"Сообщение: " << it->_message << endl;
+			server.Write("\nОтправитель: ");
+			server.Write(it->_sender);
+			server.Write("\nСообщение: ");
+			server.Write(it->_message);
+			server.Write("\n");
 		}
 	}
 	if (count != 0)
 	{
-		cout << "\n------------------------------------------------------\n";
+		server.Write("\n------------------------------------------------------\n");
 		deletePublicMessage(recipient);
 	}
 }
@@ -239,9 +249,15 @@ void Chat::printAllMessage()
 {
 	for (vector<Message>::iterator it = viewedMessage.begin(); it != viewedMessage.end(); it++)
 	{
-		cout << "\nОтправитель: " << it->_sender << endl <<
-			"Получатель: " << it->_recipient << endl <<
-			"Сообщение: " << it->_message << endl;
+			server.Write("\nОтправитель: " );
+			server.Write(it->_sender);
+			server.Write("\n");
+			server.Write("Получатель: " );
+			server.Write(it->_recipient);
+			server.Write("\n");
+			server.Write("Сообщение: ");
+			server.Write(it->_message);
+			server.Write("\n");
 	}
 	cout << endl;
 }
@@ -264,7 +280,7 @@ void Chat::readUsers() {
 
         if (!file)
         {
-                cout << "No file" << endl;
+                server.Write("No file");
                 return;
         }
       	
@@ -403,7 +419,7 @@ void Chat::readPrivateMessage() {
 
         if (!file)
         {
-                cout << "No file" << endl;
+                server.Write("No file\n");
                 return;
         }
         
@@ -455,7 +471,7 @@ void Chat::readPublicMessage() {
 
         if (!file)
         {
-                cout << "No file" << endl;
+                server.Write("No file");
                 return;
         }
 
@@ -503,36 +519,43 @@ void Chat::readPublicMessage() {
 
 void Chat::start() {
 
- char c = 'y'; // условие выхода из цикла
+ string c = "y"; // условие выхода из цикла
 
 	 if (getReadUsersStatus() == 1) { // если есть файл с данными о ранее зарегистрированных пользователях,
 					 // то сначала спрашиваем о регистрации нового пользователя и в зависимости от ответа выполняем регистрацию
 		getChat(); // вывод пользователей на экран, чтобы было видно логины и пароли 
-		cout << "\nХотите зарегистрировать ещё одного пользователя?(y/n)" << endl;
-		cin >> c;
+		server.Write("\nХотите зарегистрировать ещё одного пользователя?(y/n)\n");
+		c = server.Read();
 	}
-	while (c == 'y') {
+	while (c == "y") {
 		registration();
-		cout << "\nХотите зарегистрировать ещё одного пользователя?(y/n)" << endl;
-		cin >> c;
-		cout << endl;
+		server.Write("\nХотите зарегистрировать ещё одного пользователя?(y/n)\n");
+		c = server.Read();
 	}
 
         getChat();
         enter(); // авторизация
-        c = 'y';
-        while (c != 'n')
+        c = "y";
+        while (c != "n")
         {
                 if (getstatus()) // проверяем был ли выполнен вход
                 {
                         char message;
-                        cout << "\nХотите отправить сообщение?(y/n)\n";
-                        cin >> c;
+						string m;
+                        server.Write("\nХотите отправить сообщение?(y/n)\n");
+                        c = server.Read();
 
-                        if (c == 'y')
+                        if (c == "y")
                         {
-                                cout << "\nВыберите тип отправляемого сообщения: 1-private, 2-public\n";
-                                cin >> message;
+                                server.Write("\nВыберите тип отправляемого сообщения: 1-private, 2-public\n");
+                                m = server.Read();
+								if (m == "1") {
+									message = '1';
+								}
+								if (m == "2") {
+									message = '2';
+								}
+
                                 switch (message)
                                 {
                                 case '1':
@@ -542,15 +565,15 @@ void Chat::start() {
                                         sendPublicMessage();
                                         break;
                                 default:
-                                        cout << "\nНекорректный ввод!\n";
+                                        server.Write("\nНекорректный ввод!\n");
                                         break;
                                 }
                         }
-                        if (c == 'n')
+                        if (c == "n")
                         {
-                                cout << "\nХотите выполнить вход под другой учетной записью?(y/n)\n";
-                                cin >> c;
-                                if (c == 'y')
+                                server.Write("\nХотите выполнить вход под другой учетной записью?(y/n)\n");
+                                c = server.Read();
+                                if (c == "y")
                                 {
                                         exit();
                                         enter();
@@ -563,8 +586,8 @@ void Chat::start() {
                 }
                 else
                 {
-                        c = 'n';
-                        cout << "\nВход не выполнен!\n";
+                        c = "n";
+                        server.Write("\nВход не выполнен!\n");
                 }
         }
 }

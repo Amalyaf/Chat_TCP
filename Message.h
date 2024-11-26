@@ -15,14 +15,17 @@ struct Message
 	{
 
 	}
-	void setMessage() //  ввод сообщения
+	void setMessage(std::string text) //  ввод сообщения
 	{
-		if (std::cin.peek() == '\n')
+		/*if (std::cin.peek() == '\n')
 		{
 			std::cin.get();// убирает оставшийся в потоке символ перехода на новую строку
 		}
-		std::getline(std::cin, _message);
+		std::getline(std::cin, _message);*/
+
+		_message = text;
 	}
+	
 	void getMessage() // вывод сообщения
 	{
 		std::cout << _message;

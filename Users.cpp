@@ -17,6 +17,21 @@ void Users::setUser()
 	std::cin >> _name;
 }
 
+void Users::setLogin(std::string lgn)
+{
+	_login = lgn;
+}
+
+void Users::setPassword(std::string pswd)
+{
+	_password = pswd;
+}
+
+void Users::setName(std::string nm)
+{
+	_name = nm;
+}
+
 std::string Users::getLogin()
 {
 	return _login;

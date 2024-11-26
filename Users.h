@@ -10,6 +10,9 @@ public:
 	Users(); // конструктор
 	~Users() = default;// деструктор
 	void setUser(); // метод запрашивает данные пользователя
+	void setLogin(std::string lgn);
+	void setPassword(std::string pswd);
+	void setName(std::string nm);
 	std::string getLogin(); // метод возвращает логин пользователя
 	std::string getPassword(); // метод возвращает пароль пользователя
 	std::string getName(); // метод возвращает имя пользователя
