@@ -4,5 +4,10 @@ int main()
 {
 	setlocale(LC_ALL, "");
 	Chat chat;
-	chat.start();
+	if (status_connect == "Yes") {
+		chat.start();
+	}
+	else {
+		std::cout << "Сервер не подключён" << std::endl;
+	}
 }

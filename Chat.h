@@ -10,7 +10,7 @@ constexpr auto private_message = "/tmp/Data/private_message.txt";	// файл д
 constexpr auto public_message = "/tmp/Data/public_message.txt";	// файл для хранения непрочитанных общих сообщений
 constexpr auto prvt_msg_count = "/tmp/Data/private_message_count.txt";   // файл для хранения кол-ва личных непрочитанных сообщений
 constexpr auto pblc_msg_count = "/tmp/Data/public_message_count.txt";   // файл для хранения кол-ва общих непрочитанных сообщений
-
+extern std::string status_connect;
 
 class Chat
 {

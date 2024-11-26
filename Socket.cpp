@@ -57,6 +57,7 @@ void Server::Write(std::string msg)
         if (bytes_sent < 0) {
             std::cout << "Failed to send data to the client!" << std::endl;
         }
+        msg.clear();
 }
 
 std::string Server::Read()
@@ -64,6 +65,7 @@ std::string Server::Read()
     msg.clear();
         // Чтение данных от клиента
         char buffer[MESSAGE_LENGTH];
+        bzero(buffer, sizeof(buffer));
         ssize_t bytes_received = read(connection, buffer, sizeof(buffer));
         if (bytes_received > 0) {
             buffer[bytes_received] = '\0';  // Завершаем строку нулевым символом
