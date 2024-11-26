@@ -54,9 +54,7 @@ void Server::Write(std::string msg)
         
         // Отправка данных клиенту
         ssize_t bytes_sent = write(connection, msg.c_str(), msg.size());
-        if (bytes_sent >= 0) {
-            std::cout << "Data successfully sent to the client!" << std::endl;
-        } else {
+        if (bytes_sent < 0) {
             std::cout << "Failed to send data to the client!" << std::endl;
         }
 }
@@ -70,18 +68,11 @@ std::string Server::Read()
         if (bytes_received > 0) {
             buffer[bytes_received] = '\0';  // Завершаем строку нулевым символом
             msg = buffer;
-            std::cout << "Data received from client: " << msg << std::endl;
+            std::cout << msg << std::endl;
         } else {
-            std::cout << "Error reading from client!" << std::endl;
-            return "error";
+            return "Error reading from client!";
         }
-
-        if (msg == "end") {
-            std::cout << "Client Exited." << std::endl;
-            std::cout << "Server is Exiting..." << std::endl;
-            return msg;
-        }
-        return msg;
+    return msg;
 }
 
 void Server::exit()
