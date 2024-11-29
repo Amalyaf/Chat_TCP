@@ -6,7 +6,7 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
-#define MESSAGE_LENGTH 10000 // max size of bufer
+#define MESSAGE_LENGTH 1024 // max size of bufer
 #define PORT 7777
 
 class Client {
