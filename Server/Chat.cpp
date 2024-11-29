@@ -30,7 +30,9 @@ Chat::Chat()
 Chat::~Chat() {
 	writeUsers(); // метод для записи данных зарегистрированных пользователей в файл
 	writeMessage(); // метод для записи личных и публичных сообщений в отдельные файлы
-	server.Write("Exit");
+	if (status_connect == "Yes") {
+		server.Write("Exit");
+	}
 	server.exit();
 }
 
