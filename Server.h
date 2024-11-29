@@ -1,10 +1,11 @@
+#pragma once
 #include <iostream>
 #include <unistd.h>
 #include <string.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 
-#define MESSAGE_LENGTH 1024 // max size of bufer
+#define MESSAGE_LENGTH 10000 // max size of bufer
 #define PORT 7777
 
 

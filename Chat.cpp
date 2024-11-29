@@ -18,11 +18,11 @@ Chat::Chat()
 		readPublicMessage();
 	}
 	if (server.init() == 0){
-		std::cout << "Server successfully connected!" << std::endl;
+		//std::cout << "Server successfully connected!" << std::endl;
 		status_connect = "Yes";
 	}
 	else {
-		std::cout << "Server not connected!" << std::endl;
+		//std::cout << "Server not connected!" << std::endl;
 		status_connect = "No";
 	}
 }
@@ -30,6 +30,7 @@ Chat::Chat()
 Chat::~Chat() {
 	writeUsers(); // метод для записи данных зарегистрированных пользователей в файл
 	writeMessage(); // метод для записи личных и публичных сообщений в отдельные файлы
+	server.Write("Exit");
 	server.exit();
 }
 
@@ -38,7 +39,12 @@ void Chat::getChat()
 {
 	for (std::vector<Users>::iterator it = allUsers.begin(); it < allUsers.end(); it++)
 	{
-		std::cout << *it << std::endl;
+		server.Write("\nЛогин пользователя: ");
+		server.Write(it->getLogin());
+		server.Write("\nПароль: ");
+		server.Write(it->getPassword());
+		server.Write("\nИмя: ");
+		server.Write(it->getName());
 	}
 }
 
@@ -49,7 +55,7 @@ void Chat::enter()
 	{
 		try
 		{
-			server.Write("Введите логин:");
+			server.Write("Введите логин: ");
 			_login = server.Read();
 			Users user;
 			user._login = _login;
@@ -63,7 +69,7 @@ void Chat::enter()
 			else
 			{
 				user = *result;
-				server.Write("Введите пароль:");
+				server.Write("Введите пароль: ");
 				_password = server.Read();
 				
 				if (user._password != _password)
@@ -107,7 +113,7 @@ void Chat::registration()
 			std::vector<Users>::iterator result = find(allUsers.begin(), allUsers.end(), user);
 			if (result != allUsers.end())
 			{
-				server.Write("\nПользователь с таким логином уже существует!\nХотите повторить попытку?(y/n)");
+				server.Write("\nПользователь с таким логином уже существует!\nХотите повторить попытку?(y/n)\n");
 				c = server.Read();
 			}
 			else
@@ -187,7 +193,6 @@ void Chat::printMessage(std::string recipient)
 			server.Write(it->_recipient);
 			server.Write("\nСообщение: ");
 			server.Write(it->_message);
-			server.Write("\n");
 		}
 	}
 	if (count != 0)
@@ -533,14 +538,17 @@ void Chat::start() {
 
 			if (c == "y")
 			{
-				server.Write("\nВыберите тип отправляемого сообщения: 1-private, 2-public\n");
+				server.Write("\nВыберите тип отправляемого сообщения: 1-private, 2-public:\n");
 				m = server.Read();
+
 				if (m == "1") {
 					message = '1';
 				}
-				if (m == "2") {
+
+				else if (m == "2") {
 					message = '2';
 				}
+
 				else {
 					message = '3';
 				}

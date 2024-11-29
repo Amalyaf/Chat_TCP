@@ -1,4 +1,4 @@
-#include "Socket.h"
+#include "Server.h"
 
 Server::Server()
 {
@@ -57,7 +57,7 @@ void Server::Write(std::string msg)
         if (bytes_sent < 0) {
             std::cout << "Failed to send data to the client!" << std::endl;
         }
-        msg.clear();
+        //msg.clear();
 }
 
 std::string Server::Read()

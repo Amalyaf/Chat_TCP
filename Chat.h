@@ -2,7 +2,7 @@
 #include <vector>
 #include "Users.h"
 #include "Message.h"
-#include "Socket.h"
+#include "Server.h"
 
 constexpr auto userData = "/tmp/Data/userData.txt";	// файл для хранения данных пользователей 
 constexpr auto user_count = "/tmp/Data/user_count.txt";	// файл для хранения кол-ва зарегистрированных пользователей
